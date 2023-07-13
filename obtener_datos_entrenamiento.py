@@ -1,3 +1,4 @@
+import tweepy
 import botometer
 import pymongo
 
@@ -36,7 +37,7 @@ try:
     coleccion_humanos = baseDatos['humanos']
     coleccion_sin_clasificar = baseDatos['sin_clasificar']
 
-    for documento in coleccion.find().skip(2000).limit(2000):
+    for documento in coleccion.find().skip(6000).limit(2000):
         id_str = documento['author_id']
 
         try:
@@ -48,6 +49,9 @@ try:
             else:
                 coleccion_humanos.insert_one(documento)
                 crear_campo_base_datos("bot", 0)
+        except tweepy.error.TweepError: # type: ignore
+            print("Error con el API de Twitter")
+            break
         except:
             coleccion_sin_clasificar.insert_one(documento)
 
