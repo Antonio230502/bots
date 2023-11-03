@@ -62,13 +62,6 @@ MONGO_BASEDATOS = "clasificador_sentimientos"
 MONGO_COLLECCION = "tuits"
 CANTIDAD_DOCUMENTOS = 3
 
-#Esto se puede omitir porque ya existen los campos en los tuits
-# cantidad_retuits = recuperar_valor("public_metrics", "retweet_count")
-# crear_campo_base_datos("numero_retuits", cantidad_retuits)
-
-# cantidad_likes = recuperar_valor("public_metrics", "like_count")
-# crear_campo_base_datos("numero_likes", cantidad_likes)
-
 try:
     cliente = pymongo.MongoClient(MONGO_URI)
     baseDatos = cliente[MONGO_BASEDATOS]

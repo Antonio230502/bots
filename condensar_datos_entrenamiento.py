@@ -1,7 +1,4 @@
-import tweepy
-import botometer
 import pymongo
-
 
 MONGO_HOST = "localhost"
 MONGO_PUERTO = "27017"
@@ -13,13 +10,16 @@ try:
     baseDatos = cliente[MONGO_BASEDATOS]
     coleccion_bots = baseDatos['bots']
     coleccion_humanos = baseDatos['humanos']
-    coleccion_datos_entrenamiento = baseDatos['datos_entrenamiento']
 
     for documento in coleccion_bots.find():
-        coleccion_datos_entrenamiento.insert_one(documento)
+        filtro = {"_id": documento["_id"]} 
+        actualizacion = {"$set": {"para_los_bots.bot": 1}}
+        coleccion_bots.update_one(filtro, actualizacion)
 
     for documento in coleccion_humanos.find():
-        coleccion_datos_entrenamiento.insert_one(documento)
+        filtro = {"_id": documento["_id"]} 
+        actualizacion = {"$set": {"para_los_bots.bot": 0}}
+        coleccion_humanos.update_one(filtro, actualizacion)
 
     cliente.close()
 

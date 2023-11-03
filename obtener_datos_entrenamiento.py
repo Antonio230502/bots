@@ -1,4 +1,3 @@
-import tweepy
 import botometer
 import pymongo
 
@@ -49,9 +48,6 @@ try:
             else:
                 coleccion_humanos.insert_one(documento)
                 crear_campo_base_datos("bot", 0)
-        except tweepy.error.TweepError: # type: ignore
-            print("Error con el API de Twitter")
-            break
         except:
             coleccion_sin_clasificar.insert_one(documento)
 
