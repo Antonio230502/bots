@@ -49,25 +49,20 @@ def limpiar_objeto(cantidad_objeto, campo, subcampo, opcional=""):
         objeto = documento["entities"][campo][i][subcampo]
         texto_limpio = texto_limpio.replace(opcional + objeto, "")
 
-def codificar_texto(texto):
-    vectorizer = TfidfVectorizer()
-    texto_codificado = vectorizer.fit_transform([texto])
-    texto_codificado_denso = texto_codificado.toarray().tolist() # type: ignore
-    return texto_codificado_denso
-
 MONGO_HOST = "localhost"
 MONGO_PUERTO = "27017"
 MONGO_URI = "mongodb://" + MONGO_HOST + ":" + MONGO_PUERTO + "/"
 MONGO_BASEDATOS = "clasificador_sentimientos"
-MONGO_COLLECCION = "tuits"
+MONGO_COLLECCION = "publicaciones"
 CANTIDAD_DOCUMENTOS = 3
 
 try:
+    tiempo_inicial = time.time() #Iniciar cronometro
+
     cliente = pymongo.MongoClient(MONGO_URI)
     baseDatos = cliente[MONGO_BASEDATOS]
     coleccion = baseDatos[MONGO_COLLECCION]
 
-    tiempo_inicial = time.time() #Iniciar cronometro
     for documento in coleccion.find():
 
         cantidad_urls = obtener_longitud_arreglo("entities", "urls")
@@ -84,9 +79,6 @@ try:
         limpiar_texto()
         crear_campo_base_datos("texto_limpio", texto_limpio)
 
-        texto_codificado = codificar_texto(texto)
-        crear_campo_base_datos("texto_codificado", texto_codificado[0])
-
         caracteres_a_buscar = r"[¿?¡!]"
         signos_interrogacion_exclamacion = len(re.findall(caracteres_a_buscar, texto_limpio))
         crear_campo_base_datos("numero_signos_interrogacion_exclamacion", signos_interrogacion_exclamacion)
@@ -95,9 +87,9 @@ try:
         simbolos_especiales = len(re.findall(caracteres_a_buscar, texto_limpio))
         crear_campo_base_datos("numero_simbolos_especiales", simbolos_especiales)
 
+    cliente.close()
     tiempo_transcurrido = time.time() - tiempo_inicial
     print("Tiempo transcurrido:", tiempo_transcurrido)
-    cliente.close()
 
 except pymongo.errors.InvalidURI: # type: ignore
     print("La url de conexión es incorrecta")

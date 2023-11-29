@@ -4,12 +4,13 @@
 import pymongo
 import pandas as pd
 from bson.objectid import ObjectId
+import time
 
 MONGO_HOST = "localhost"
 MONGO_PUERTO = "27017"
 MONGO_URI = "mongodb://" + MONGO_HOST + ":" + MONGO_PUERTO + "/"
 MONGO_BASEDATOS = "clasificador_sentimientos"
-MONGO_COLLECCION = "tuits"
+MONGO_COLLECCION = "publicaciones"
 
 def crear_campo_base_datos(coleccion, documento, nombre_campo, valor):
     if nombre_campo in documento:
@@ -20,12 +21,13 @@ def crear_campo_base_datos(coleccion, documento, nombre_campo, valor):
         coleccion.update_one(filtro, actualizacion)
 
 try:
+    tiempo_inicial = time.time() #Iniciar cronometro
     cliente = pymongo.MongoClient(MONGO_URI)
     baseDatos = cliente[MONGO_BASEDATOS]
     coleccion = baseDatos[MONGO_COLLECCION]
 
-    coleccion_bots = baseDatos['bots']
-    coleccion_humanos = baseDatos['humanos']
+    coleccion_bots = baseDatos['bots_entrenamiento']
+    coleccion_humanos = baseDatos['humanos_entrenamiento']
 
     df = pd.read_excel('Limpieza completa.xlsx', sheet_name='Humanos', engine='openpyxl')
     ids_humanos = df['Usuarios'].tolist()
@@ -55,6 +57,8 @@ try:
         crear_campo_base_datos(coleccion_bots, bot, "bot", 1)
 
     cliente.close()
+    tiempo_transcurrido = time.time() - tiempo_inicial
+    print("Tiempo transcurrido:", tiempo_transcurrido)
 
 except pymongo.errors.InvalidURI: # type: ignore
     print("La url de conexión es incorrecta")
